@@ -12,83 +12,98 @@
 Adafruit_SI1145 uv = Adafruit_SI1145();
 SFE_BMP180 pressure;
 
-#define ALTITUDE 100.0 // Approx altitude of Queen's
-File myFile;
+#define ALTITUDE 100.0 // Approx altitude of Queen's ============== LOOK INTO WHERE THIS IS USED AND IF NEEDED, AS ALTITUDE WILL CHANGE IN FLIGHT
+File dataFile;
+File logFile;
 
+bool serialOutput = true;
 
 void setup() {
-  Serial.begin(9600);
-  Serial.println("REBOOT");
-  // Open serial communications and wait for port to open:
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
-  
-  // Adafruit Vis/IR/UV sensor
-  Serial.println("Adafruit SI1145 test");
-  
-  if (! uv.begin()) {
-    Serial.println("Didn't find Si1145");
-    while (1);
-  }
-
-  Serial.println("Adafruit OK!");
-
-  // Initialize the pressure sensor (it is important to get calibration values stored on the device).
-
-  if (pressure.begin())
-    Serial.println("BMP180 init success");
-  else
-  {
-    // Oops, something went wrong, this is usually a connection problem,
-    // see the comments at the top of this sketch for the proper connections.
-
-    Serial.println("BMP180 init fail\n\n");
-    while(1); // Pause forever.
-  }
-
-
-  // SD Card
-  Serial.print("Initializing SD card...");
-
-  if (!SD.begin(10)) {
-    Serial.println("initialization failed!");
-    while (1);
-  }
-  Serial.println("initialization done.");
-
-  // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.
-  myFile = SD.open("test.txt", FILE_WRITE);
-
-  // if the file opened properly, write to it:
-  if (myFile) {
-    Serial.print("Writing to test.txt...");
-    myFile.println("testing 1, 2, 3.");
-    // close the file:
-    myFile.close();
-    Serial.println("done.");
-  } else {
-    // if the file didn't open, print an error:
-    Serial.println("error opening test.txt");
-  }
-
-  // re-open the file for reading:
-  myFile = SD.open("test.txt");
-  if (myFile) {
-    Serial.println("test.txt:");
-
-    // read from the file until there's nothing else in it:
-    while (myFile.available()) {
-      Serial.write(myFile.read());
+  if serialOutput{ // For interfacing with Serial monitor
+    Serial.begin(9600);
+    Serial.println("REBOOT");    
+    // Open serial communications and wait for port to open:
+    while (!Serial) {
+      ; // wait for serial port to connect. Needed for native USB port only
     }
-    // close the file:
-    myFile.close();
-  } else {
-    // if the file didn't open, print an error:
-    Serial.println("error opening test.txt");
+  
+    // INITIALISATION SECTION
+    //=======================
+    // Initialise the SD Card (See https://www.arduino.cc/reference/en/libraries/sd/)
+    // SD Card
+    Serial.print("Initializing SD card...");
+
+    if (!SD.begin(10)) {
+      Serial.println("SD card initialization failed!");
+      while (1);
+    }
+    Serial.println("SD card initialization done.");
+
+    // Initialise the Adafruit Vis/IR/UV sensor
+    Serial.println("Adafruit SI1145 test");
+  
+    if (! uv.begin()) {
+      Serial.println("Didn't find Si1145");
+      while (1);
+    }
+
+    Serial.println("Adafruit OK!");
+
+    // Initialize the pressure sensor (it is important to get calibration values stored on the device).
+    if (pressure.begin())
+      Serial.println("BMP180 init success");
+    else
+    {
+      // Oops, something went wrong, this is usually a connection problem,
+      // see the comments at the top of this sketch for the proper connections.
+
+      Serial.println("BMP180 init fail\n\n");
+      while(1); // Pause forever.
+    }
+  }  
+  else{ // for when running without serial monitor  
+    // INITIALISATION SECTION
+    //=======================
+    // Initialise the SD Card (See https://www.arduino.cc/reference/en/libraries/sd/)
+    // (Don't run the rest of the code if this fails)
+      if (!SD.begin(10)) { // uses the default SS hardware pin of 10
+      while (1);
+    }
+    // Save to a log file that the SD card was succesfully initialised
+    logFile = SD.open("logs.txt", FILE_WRITE);
+    logFile.println("SD card successfully initialised at [TIME]"); // =========== ADD TIME IDENTIFIER
+    
+    // Initialise the Adafruit Vis/IR/UV sensor
+    if (uv.begin()) {
+      // Save to a log file that the light sensor was succesfully initialised
+      logFile.println("Light sensor successfully initialised at [TIME]"); // =========== ADD TIME IDENTIFIER
+    }
+    else{
+      // Save to a log file that the light sensor failed to initialise
+      logFile.println("Light sensor failed to initialise at [TIME]"); // =========== ADD TIME IDENTIFIER
+      logFile.close()   
+      while (1); // pause forever
+    }
+
+    // Initialize the pressure sensor (it is important to get calibration values stored on the device).      
+    if (pressure.begin())
+      // Save to a log file that the pressure sensor was succesfully initialised
+      logFile.println("Pressure sensor successfully initialised at [TIME]"); // =========== ADD TIME IDENTIFIER
+    else
+    {
+      // Save to a log file that the pressure sensor failed to initialise
+      logFile.println("Pressure sensor failed to initialise at [TIME]"); // =========== ADD TIME IDENTIFIER
+      logFile.close()   
+      while(1); // Pause forever.
+
+    // close the log file
+    logFile.close();
+    }  
+
+    // OPEN THE DATA FILE
+    // note that only one file can be open at a time
+    dataFile = SD.open("flightData.txt", FILE_WRITE);
   }
-}
 
 void loop() {
 
