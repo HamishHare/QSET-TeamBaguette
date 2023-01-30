@@ -16,10 +16,10 @@ SFE_BMP180 pressure;
 File dataFile;
 File logFile;
 
-bool serialOutput = true;
+bool serialOutput = false;
 
 void setup() {
-  if serialOutput{ // For interfacing with Serial monitor
+  if (serialOutput){ // For interfacing with Serial monitor
     Serial.begin(9600);
     Serial.println("REBOOT");    
     // Open serial communications and wait for port to open:
@@ -66,44 +66,51 @@ void setup() {
     //=======================
     // Initialise the SD Card (See https://www.arduino.cc/reference/en/libraries/sd/)
     // (Don't run the rest of the code if this fails)
-      if (!SD.begin(10)) { // uses the default SS hardware pin of 10
+    Serial.begin(9600);
+    if (!SD.begin(10)) { // uses the default SS hardware pin of 10
       while (1);
     }
     // Save to a log file that the SD card was succesfully initialised
     logFile = SD.open("logs.txt", FILE_WRITE);
     logFile.println("SD card successfully initialised at [TIME]"); // =========== ADD TIME IDENTIFIER
+    //Serial.println("Log file opened");
     
     // Initialise the Adafruit Vis/IR/UV sensor
     if (uv.begin()) {
       // Save to a log file that the light sensor was succesfully initialised
       logFile.println("Light sensor successfully initialised at [TIME]"); // =========== ADD TIME IDENTIFIER
+      //Serial.println("Light sensor started");
     }
     else{
       // Save to a log file that the light sensor failed to initialise
       logFile.println("Light sensor failed to initialise at [TIME]"); // =========== ADD TIME IDENTIFIER
-      logFile.close()   
+      //Serial.println("Light sensor failed");
+      logFile.close();
       while (1); // pause forever
     }
 
     // Initialize the pressure sensor (it is important to get calibration values stored on the device).      
-    if (pressure.begin())
+    if (pressure.begin()){
       // Save to a log file that the pressure sensor was succesfully initialised
       logFile.println("Pressure sensor successfully initialised at [TIME]"); // =========== ADD TIME IDENTIFIER
-    else
+      //Serial.println("Pressure sensor started");
+    } else
     {
       // Save to a log file that the pressure sensor failed to initialise
       logFile.println("Pressure sensor failed to initialise at [TIME]"); // =========== ADD TIME IDENTIFIER
-      logFile.close()   
+      //Serial.println("Pressure sensor failed");
+      logFile.close(); 
       while(1); // Pause forever.
+    }  
 
     // close the log file
     logFile.close();
-    }  
-
+    //Serial.println("Log file closed");
     // OPEN THE DATA FILE
     // note that only one file can be open at a time
     dataFile = SD.open("flightData.txt", FILE_WRITE);
   }
+}
 
 void loop() {
 
@@ -127,7 +134,7 @@ void loop() {
 
   // Pressure sensor:
 
-  Serial.println("ADAFRUIT VIS/IR/UV:");
+  Serial.println("Pressure sensor");
   char status;
   double T,P,p0,a;
 
