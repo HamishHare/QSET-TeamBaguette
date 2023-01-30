@@ -124,11 +124,12 @@ void loop() {
   // Uncomment if you have an IR LED attached to LED pin!
   //Serial.print("Prox: "); Serial.println(uv.readProx());
 
-  float UVindex = uv.readUV();
+  //float UVindex = uv.readUV(); ========== I COMMENTED THIS OUT AS DIDN't LIKE IT REDIFINING THE VARIABLE EACH LOOP, BUT KEEPING AS REFERENCE
   // the index is multiplied by 100 so to get the
   // integer index, divide by 100!
-  UVindex /= 100.0;  
-  Serial.print("UV: ");  Serial.println(UVindex);
+  //UVindex /= 100.0;  
+  //Serial.print("UV: ");  Serial.println(UVindex);
+  Serial.print("UV: ");  Serial.println(uv.readUV()/100);
 
   delay(1000);
 
