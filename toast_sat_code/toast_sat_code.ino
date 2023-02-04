@@ -16,7 +16,7 @@ SFE_BMP180 pressure;
 File dataFile;
 File logFile;
 
-bool serialOutput = false;
+bool serialOutput = true;
 
 void setup() {
   if (serialOutput){ // For interfacing with Serial monitor
@@ -112,6 +112,11 @@ void setup() {
   }
 }
 
+// Declare variables used in loop
+// For pressure sensor
+char status;
+double T,P,p0,a;
+
 void loop() {
 
   // Adafruit sensor:
@@ -124,22 +129,20 @@ void loop() {
   // Uncomment if you have an IR LED attached to LED pin!
   //Serial.print("Prox: "); Serial.println(uv.readProx());
 
-  //float UVindex = uv.readUV(); ========== I COMMENTED THIS OUT AS DIDN't LIKE IT REDIFINING THE VARIABLE EACH LOOP, BUT KEEPING AS REFERENCE
+  //float UVindex = uv.readUV(); ========== I COMMENTED THIS OUT AS DIDN'T LIKE IT REDIFINING THE VARIABLE EACH LOOP, BUT KEEPING AS REFERENCE
   // the index is multiplied by 100 so to get the
   // integer index, divide by 100!
   //UVindex /= 100.0;  
   //Serial.print("UV: ");  Serial.println(UVindex);
   Serial.print("UV: ");  Serial.println(uv.readUV()/100);
 
-  delay(1000);
+  delay(1000); // =========== MAY NOT BE NEEDED? DEPENDS HOW LONG READING TAKES
 
   // Pressure sensor:
 
-  Serial.println("Pressure sensor");
-  char status;
-  double T,P,p0,a;
-
-  // Loop here getting pressure readings every 10 seconds.
+  Serial.println("PRESSURE/TEMP SENSOR:");
+  Serial.println("=====================");
+  // Loop here getting pressure readings.
 
   // If you want sea-level-compensated pressure, as used in weather reports,
   // you will need to know the altitude at which your measurements are taken.
@@ -149,8 +152,6 @@ void loop() {
   Serial.print("provided altitude: ");
   Serial.print(ALTITUDE,0);
   Serial.print(" meters, ");
-  Serial.print(ALTITUDE*3.28084,0);
-  Serial.println(" feet");
   
   // If you want to measure altitude, and not pressure, you will instead need
   // to provide a known baseline pressure. This is shown at the end of the sketch.
@@ -178,8 +179,6 @@ void loop() {
       Serial.print("temperature: ");
       Serial.print(T,2);
       Serial.print(" deg C, ");
-      Serial.print((9.0/5.0)*T+32.0,2);
-      Serial.println(" deg F");
       
       // Start a pressure measurement:
       // The parameter is the oversampling setting, from 0 to 3 (highest res, longest wait).
@@ -204,11 +203,9 @@ void loop() {
           // Print out the measurement:
           Serial.print("absolute pressure: ");
           Serial.print(P,2);
-          Serial.print(" mb, ");
-          Serial.print(P*0.0295333727,2);
-          Serial.println(" inHg");
+          Serial.print(" mb");
 
-          // The pressure sensor returns abolute pressure, which varies with altitude.
+          // The pressure sensor returns absolute pressure, which varies with altitude.
           // To remove the effects of altitude, use the sealevel function and your current altitude.
           // This number is commonly used in weather reports.
           // Parameters: P = absolute pressure in mb, ALTITUDE = current altitude in m.
@@ -217,9 +214,7 @@ void loop() {
           p0 = pressure.sealevel(P,ALTITUDE); // we're at 1655 meters (Boulder, CO)
           Serial.print("relative (sea-level) pressure: ");
           Serial.print(p0,2);
-          Serial.print(" mb, ");
-          Serial.print(p0*0.0295333727,2);
-          Serial.println(" inHg");
+          Serial.print(" mb");
 
           // On the other hand, if you want to determine your altitude from the pressure reading,
           // use the altitude function along with a baseline pressure (sea-level or other).
@@ -229,9 +224,7 @@ void loop() {
           a = pressure.altitude(P,p0);
           Serial.print("computed altitude: ");
           Serial.print(a,0);
-          Serial.print(" meters, ");
-          Serial.print(a*3.28084,0);
-          Serial.println(" feet");
+          Serial.print(" meters");
         }
         else Serial.println("error retrieving pressure measurement\n");
       }
