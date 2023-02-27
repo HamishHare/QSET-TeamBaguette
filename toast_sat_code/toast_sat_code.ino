@@ -12,15 +12,19 @@
 Adafruit_SI1145 uv = Adafruit_SI1145();
 SFE_BMP180 pressure;
 
-#define ALTITUDE 100.0 // Approx altitude of Queen's ============== LOOK INTO WHERE THIS IS USED AND IF NEEDED, AS ALTITUDE WILL CHANGE IN FLIGHT
+#define ALTITUDE 100.0 // Approx altitude of Queen's
 File dataFile;
 File logFile;
 
+const bool serialOutput = false;
+
 const unsigned long MIN_TIME_MS = 3600000; // The minimum time to run the code for in milliseconds (one hour)
-const unsigned long MAX_TIME_MS = 18000000; // The maximum time to run the code for in milliseconds (five hours)
+const unsigned long MAX_TIME_MS = 14400000; // The maximum time to run the code for in milliseconds (four hours)
+//const unsigned long MAX_TIME_MS = 300500; // Just over 5 minutes, for testing.
 const float MIN_HEIGHT = 300.0; // The minimum height in metres, below which we stop recording data
-const unsigned int MIN_NUM_MEASUREMENTS = 300; // The minimum number of measurements
-const bool serialOutput = true;
+const unsigned int MIN_NUM_MEASUREMENTS = 100; // The minimum number of measurements
+
+const unsigned long DELAY_BETWEEN_MEASUREMENTS = 60000; // The time between measurements in milliseconds (1 minute)
 
 void setup() {
   if (serialOutput){ // For interfacing with Serial monitor
@@ -119,6 +123,7 @@ void setup() {
     // note that only one file can be open at a time
     dataFile = SD.open("flightData.txt", FILE_WRITE);
     dataFile.println("Time (ms), Visible (arb.), IR (arb.), UV Index, Temperature (deg C), Pressure (mbar), Altitude (m)");
+    dataFile.close();
   }
 }
 
@@ -250,6 +255,9 @@ void loop() {
   }
   else{ // If saving to the file
     // PERFORM THE CODE
+    dataFile = SD.open("flightData.txt", FILE_WRITE);
+    
+    // TIME    
     dataFile.print(millis()); dataFile.print(","); // time
 
     // LIGHT DATA
@@ -326,10 +334,12 @@ void loop() {
     // Start a new line in the data file and increase number of measurements counter
     dataFile.print("\n");
     num_measurements++;
+    // Make sure the current data is physically saved to the SD card
+    dataFile.close();
   }
   
   // WAIT BEFORE NEXT MEASUREMENT
-  delay(5000);  // Pause for 5 seconds.
+  delay(DELAY_BETWEEN_MEASUREMENTS);  // Pause for 5 seconds.
 
   // EXIT CONDITION
   // Stop if a minimum amount of time has passed and the satellite is below a minimum height

@@ -13,7 +13,8 @@
 #include <SPI.h>
 #include <SD.h>
 
-File myFile;
+File logFile;
+File dataFile;
 
 void setup() {
   // Open serial communications and wait for port to open:
@@ -33,7 +34,7 @@ void setup() {
 
   // open the file. note that only one file can be open at a time,
   // so you have to close this one before opening another.
-  myFile = SD.open("logs.txt", FILE_WRITE);
+  logFile = SD.open("logs.txt", FILE_WRITE);
 
   // if the file opened properly, write to it:
   // if (myFile) {
@@ -47,20 +48,48 @@ void setup() {
   //   Serial.println("error opening test.txt");
   // }
 
-  // re-open the file for reading:
-  myFile = SD.open("logs.txt");
-  if (myFile) {
-    Serial.println("logs.txt:");
+  // Open the logs file for reading:
+  logFile = SD.open("logs.txt");
+  if (logFile) {
+    Serial.println("=================");
+    Serial.println("READING logs.txt:");
+    Serial.println("=================");
 
     // read from the file until there's nothing else in it:
-    while (myFile.available()) {
-      Serial.write(myFile.read());
+    while (logFile.available()) {
+      Serial.write(logFile.read());
     }
     // close the file:
-    myFile.close();
+    logFile.close();
+
+    Serial.println("======================");
+    Serial.println("Done reading logs.txt:");
+    Serial.println("======================");
   } else {
     // if the file didn't open, print an error:
     Serial.println("error opening logs.txt");
+  }
+
+  // Open the data file for reading:
+  dataFile = SD.open("flightData.txt");
+  if (dataFile) {
+    Serial.println("=======================");
+    Serial.println("READING flightData.txt:");
+    Serial.println("=======================");
+
+    // read from the file until there's nothing else in it:
+    while (dataFile.available()) {
+      Serial.write(dataFile.read());
+    }
+    // close the file:
+    dataFile.close();
+
+    Serial.println("============================");
+    Serial.println("Done reading flightData.txt:");
+    Serial.println("============================");
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("error opening flightData.txt");
   }
 }
 
