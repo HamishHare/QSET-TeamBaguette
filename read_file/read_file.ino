@@ -32,24 +32,8 @@ void setup() {
   }
   Serial.println("initialization done.");
 
-  // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.
-  logFile = SD.open("logs.txt", FILE_WRITE);
-
-  // if the file opened properly, write to it:
-  // if (myFile) {
-  //   Serial.print("Writing to logs.txt...");
-  //   myFile.println("testing 1, 2, 3.");
-  //   // close the file:
-  //   myFile.close();
-  //   Serial.println("done.");
-  // } else {
-  //   // if the file didn't open, print an error:
-  //   Serial.println("error opening test.txt");
-  // }
-
   // Open the logs file for reading:
-  logFile = SD.open("logs.txt");
+  logFile = SD.open("logs.txt", FILE_READ);
   if (logFile) {
     Serial.println("=================");
     Serial.println("READING logs.txt:");
@@ -71,10 +55,11 @@ void setup() {
   }
 
   // Open the data file for reading:
-  dataFile = SD.open("flightData.txt");
+  delay(1000);
+  dataFile = SD.open("data.txt", FILE_READ);
   if (dataFile) {
     Serial.println("=======================");
-    Serial.println("READING flightData.txt:");
+    Serial.println("READING data.txt:");
     Serial.println("=======================");
 
     // read from the file until there's nothing else in it:
@@ -85,11 +70,11 @@ void setup() {
     dataFile.close();
 
     Serial.println("============================");
-    Serial.println("Done reading flightData.txt:");
+    Serial.println("Done reading data.txt:");
     Serial.println("============================");
   } else {
     // if the file didn't open, print an error:
-    Serial.println("error opening flightData.txt");
+    Serial.println("error opening data.txt");
   }
 }
 

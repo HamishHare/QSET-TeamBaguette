@@ -20,11 +20,10 @@ const bool serialOutput = false;
 
 const unsigned long MIN_TIME_MS = 3600000; // The minimum time to run the code for in milliseconds (one hour)
 const unsigned long MAX_TIME_MS = 14400000; // The maximum time to run the code for in milliseconds (four hours)
-//const unsigned long MAX_TIME_MS = 300500; // Just over 5 minutes, for testing.
 const float MIN_HEIGHT = 300.0; // The minimum height in metres, below which we stop recording data
-const unsigned int MIN_NUM_MEASUREMENTS = 100; // The minimum number of measurements
+const unsigned int MIN_NUM_MEASUREMENTS = 240; // The minimum number of measurements (240 is 2 hours of measurements every 30 seconds)
 
-const unsigned long DELAY_BETWEEN_MEASUREMENTS = 60000; // The time between measurements in milliseconds (1 minute)
+const unsigned long DELAY_BETWEEN_MEASUREMENTS = 30000; // The time between measurements in milliseconds (30 secs)
 
 void setup() {
   if (serialOutput){ // For interfacing with Serial monitor
@@ -119,9 +118,11 @@ void setup() {
     // close the log file
     logFile.close();
     //Serial.println("Log file closed");
+
+    delay(10);
     // OPEN THE DATA FILE
     // note that only one file can be open at a time
-    dataFile = SD.open("flightData.txt", FILE_WRITE);
+    dataFile = SD.open("data.txt", FILE_WRITE);
     dataFile.println("Time (ms), Visible (arb.), IR (arb.), UV Index, Temperature (deg C), Pressure (mbar), Altitude (m)");
     dataFile.close();
   }
@@ -255,7 +256,7 @@ void loop() {
   }
   else{ // If saving to the file
     // PERFORM THE CODE
-    dataFile = SD.open("flightData.txt", FILE_WRITE);
+    dataFile = SD.open("data.txt", FILE_WRITE);
     
     // TIME    
     dataFile.print(millis()); dataFile.print(","); // time

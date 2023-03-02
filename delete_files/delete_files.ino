@@ -37,15 +37,15 @@ void setup() {
   }
 
   // Check to see if the flightData file exists:
-  if (SD.exists("flightData.txt")) {
-    Serial.println("flightData.txt exists.");
+  if (SD.exists("data.txt")) {
+    Serial.println("data.txt exists.");
     
     // delete the file:
-    Serial.println("Removing flightData.txt...");
-    SD.remove("logs.txt");
+    Serial.println("Removing data.txt...");
+    SD.remove("data.txt");
 
   } else {
-    Serial.println("flightData.txt doesn't exist.");
+    Serial.println("data.txt doesn't exist.");
   }
 }
 
