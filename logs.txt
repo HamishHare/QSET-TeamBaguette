@@ -1,0 +1,18 @@
+=================
+READING logs.txt:
+=================
+
+SD card successfully initialised at 135
+Light sensor successfully initialised at 178
+Pressure sensor successfully initialised at 184
+SD card successfully initialised at 135
+Light sensor successfully initialised at 177
+Pressure sensor successfully initialised at 184
+SD card successfully initialised at 135
+Light sensor successfully initialised at 177
+Pressure sensor successfully initialised at 184
+SD card successfully initialised at 143
+Light sensor failed to initialise at 144
+======================
+Done reading logs.txt:
+======================
